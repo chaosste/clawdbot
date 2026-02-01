@@ -1,4 +1,16 @@
 #!/bin/sh
+# Git pre-commit hook
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
 [ -z "$ROOT" ] && exit 0
-node "$ROOT/scripts/format-staged.js"
+
+# Try to find node if not in PATH (common in macOS GUIs)
+if ! command -v node >/dev/null 2>&1; then
+  [ -f "$HOME/.nvm/nvm.sh" ] && . "$HOME/.nvm/nvm.sh" && nvm use default >/dev/null 2>&1
+  [ -f "$HOME/.zshrc" ] && . "$HOME/.zshrc" >/dev/null 2>&1
+fi
+
+if command -v node >/dev/null 2>&1; then
+  node "$ROOT/scripts/format-staged.js"
+else
+  echo "Warning: node not found, skipping pre-commit formatting."
+fi
